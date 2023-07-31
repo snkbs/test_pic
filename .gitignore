@@ -1,0 +1,16 @@
+*.d
+*.o
+*.bin
+*.hex
+*.list
+*.srec
+*.a
+*.elf
+*.map
+*.lnp
+*.lst
+*.uvoptx
+*.uvguix.*
+Listings/*
+Objects/*
+.build/*
