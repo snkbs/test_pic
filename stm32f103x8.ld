@@ -30,18 +30,6 @@ SECTIONS
 	_vectors_rom_begin = LOADADDR(.vectors) ;
 	_vectors_rom_end = _vectors_rom_begin + SIZEOF(.vectors) ;
 
-
-	.got : {
-		. = ALIGN(4);
-		_got_ram_begin = .;
-		*(.got*)
-		. = ALIGN(4);
-		_got_ram_end = .;
-	} >ram AT >rom
-	_got_rom_begin = LOADADDR(.got) ;
-	_got_rom_end = _got_rom_begin + SIZEOF(.got) ;
-
-
 	.text : {
 		. = ALIGN(4);
 		*(.text*)
@@ -49,7 +37,6 @@ SECTIONS
 		*(.rodata*)
 		. = ALIGN(4);
 	} >rom
-
 
 	.preinit_array : {
 		. = ALIGN(4);
@@ -82,7 +69,7 @@ SECTIONS
 	} >rom
 
 	. = ALIGN(4);
-	_etext = .;
+	_rom_end = .;
 
 
 	.noinit (NOLOAD) : {
@@ -90,6 +77,15 @@ SECTIONS
 	} >ram
 	. = ALIGN(4);
 
+	.got : {
+		. = ALIGN(4);
+		_got_ram_begin = .;
+		*(.got*)
+		. = ALIGN(4);
+		_got_ram_end = .;
+	} >ram AT >rom
+	_got_rom_begin = LOADADDR(.got) ;
+	_got_rom_end = _got_rom_begin + SIZEOF(.got) ;
 	
 	.data : {
 		_data_ram_begin = .;
@@ -111,5 +107,5 @@ SECTIONS
 	/DISCARD/ : { *(.eh_frame) }
 
 	. = ALIGN(4);
-	end = .;
+	_ram_end = .;
 }

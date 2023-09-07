@@ -12,28 +12,26 @@ ifneq ($(VERB),1)
 endif
 
 ifeq ($(DEBUG), 1)
-    CFLAGS += -ggdb3 -O0 -g3
+    CFLAGS += -O0 -ggdb -g3 -gdwarf-2
 else
-    CFLAGS += -O3
+    CFLAGS += -O2
 endif
 
-ARCH_FLAGS := -mthumb -mthumb-interwork -mcpu=cortex-m3 -msoft-float
-ALL_CFLAGS := -std=gnu99 \
-              -Wall -Wextra -Wimplicit-function-declaration \
-              -Wredundant-decls -Wstrict-prototypes -Wmissing-prototypes \
-              -Wundef -Wshadow -fstack-usage \
-              -fno-common $(ARCH_FLAGS) $(ADD_FLAGS) -MD $(DEFS) \
-              -I$(OPENCM3_DIR)/include -I$(INCLUDE_DIR) $(CFLAGS)
+ARCH_FLAGS := -mcpu=cortex-m3 -mthumb -mthumb-interwork -msoft-float
+ALL_CFLAGS := $(ARCH_FLAGS) $(CFLAGS) $(ADD_FLAGS) -MD $(DEFS) \
+              -I$(OPENCM3_DIR)/include -I$(INCLUDE_DIR) \
+              -fstack-usage -fno-common -ffunction-sections -fdata-sections \
+              -Wall -Wextra
 
-ALL_LDFLAGS := -l$(OPENCM3_LIB) --static -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group \
-               -T$(LDSCRIPT) -nostartfiles -Wl,--gc-sections -Wl,--print-memory-usage \
-               $(ARCH_FLAGS) -mfix-cortex-m3-ldrd \
-               -L$(OPENCM3_DIR)/lib
+ALL_LDFLAGS := $(ARCH_FLAGS) -T$(LDSCRIPT) -nostartfiles -nostdlib \
+               --specs=nano.specs --specs=nosys.specs \
+               -l$(OPENCM3_LIB) -L$(OPENCM3_DIR)/lib \
+               -Wl,--gc-sections,--print-memory-usage \
 
-SOURCES := $(wildcard $(addsuffix /*.c, $(SRC_DIRS)))
-SRC_ASM := $(wildcard $(addsuffix /*.s, $(SRC_DIRS)))
-OBJECTS := $(SOURCES:.c=.o)
-OBJECTS += $(SRC_ASM:.s=.o)
+C_SOURCES := $(wildcard $(addsuffix /*.c, $(SRC_DIRS)))
+A_SOURCES := $(wildcard $(addsuffix /*.s, $(SRC_DIRS)))
+OBJECTS := $(C_SOURCES:.c=.o)
+OBJECTS += $(A_SOURCES:.s=.o)
 
 all: elf hex
 rebuild: clean elf hex
@@ -102,7 +100,7 @@ debug:
 
 clean:
 	@printf "  [CLEAN]   $(BUILD_DIR)\n"
-	$(Q)find $(BUILD_DIR) -delete
+	$(Q)find "$(BUILD_DIR)" -delete
 	@printf "  [CLEAN]   $(BINARY).elf $(BINARY).bin $(BINARY).hex $(BINARY).srec $(BINARY).list $(BINARY).map\n"
 	$(Q)rm -f $(BINARY).elf $(BINARY).bin $(BINARY).hex $(BINARY).srec $(BINARY).list $(BINARY).map
 

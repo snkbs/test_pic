@@ -2,6 +2,12 @@
 #ifndef __ST_H__
 #define __ST_H__
 
+#include <stdlib.h>
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/cm3/systick.h>
+#include <libopencm3/cm3/dwt.h>
+#include <libopencm3/stm32/rcc.h>
+
 void st_setup(void);
 uint32_t st_gettick(void);
 

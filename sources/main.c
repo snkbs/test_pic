@@ -1,18 +1,13 @@
 #include <stdint.h>
-#include <libopencm3/cm3/vector.h>
-#include <libopencm3/cm3/systick.h>
-#include <libopencm3/cm3/nvic.h>
 #include <libopencmsis/core_cm3.h>
+#include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/spi.h>
-#include <libopencm3/stm32/timer.h>
-#include <libopencm3/stm32/dma.h>
 
 #include "startup_helper.h"
 #include "st.h"
 
-static volatile uint32_t test = 1;
+static uint32_t cnt = 0;
 
 int main(void)
 {
@@ -43,12 +38,20 @@ int main(void)
 
 	while (1)
 	{
-		if (test % 2 == 0)
-		{
-			gpio_toggle(GPIOB, GPIO1);
+#ifdef MAPLEMINI
+		gpio_toggle(GPIOB, GPIO1);
+#elif BLUEPILL		
+		gpio_toggle(GPIOC, GPIO13);
+#endif
+		if (cnt > 20)
+		{		
+			delay_ms(1000);
 		}
-		test++;
-		delay_ms(500);
+		else
+		{
+			delay_ms(200);
+		}
+		cnt++;
 	}
 }
 
